@@ -16,9 +16,9 @@ def criptoactiva(ticker):
         
         return cripto
     
-async def async_client(exchange_id, run_time: int, symbol: str):
+async def async_client(cripto, run_time: int, symbol: str):
     orderbook = None
-    exchange = getattr(ccxta, exchange_id)()
+    exchange = getattr(ccxta, cripto)()
     time_1 = time.time()
     time_f = 0
     ob = []
@@ -35,7 +35,7 @@ async def async_client(exchange_id, run_time: int, symbol: str):
             # Final data format for the results
             ob.append(
                 {
-                    "exchange": exchange_id,
+                    "exchange": cripto,
                     "datetime": datetime,
                     "orderbook": {
                         "ask_size": ask_size.tolist(),
