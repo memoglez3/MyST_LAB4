@@ -48,13 +48,26 @@ async def multi_orderbooks(exchanges, run_time: int, symbol: str):
     orderbooks = await asyncio.gather(*input_coroutines, return_exceptions=True)
     return orderbooks
 
-# if __name__ == "__main__":
-#     exchanges = ["kucoin", "bittrex", "bitfinex", "poloniex", "huobipro"]
-#     run_time = 10  # seconds
-#     symbol = "ETH/BTC"
+if __name__ == "__main__":
+    exchanges = ["kucoin", "bittrex", "bitfinex"]
+    run_time = 3600  # seconds
+    symbol1 = "ETH/BTC"
 
-#     data = asyncio.run(multi_orderbooks(exchanges, run_time=run_time, symbol=symbol))
-#     data = [item for sublist in data for item in sublist]
-#     data = pd.DataFrame(data)
+    data1 = asyncio.run(multi_orderbooks(exchanges, run_time=run_time, symbol=symbol1))
+    data1 = [item for sublist in data1 for item in sublist]
+    data1 = pd.DataFrame(data1)
+    data1.to_csv("orderbooks1.csv", index=False)
 
-#     print(data.head())
+    print(data1)
+
+if __name__ == "__main__":
+    exchanges = ["kucoin", "bittrex", "bitfinex"]
+    run_time = 3600  # seconds
+    symbol2 = "BTC/USDT"
+
+    data2 = asyncio.run(multi_orderbooks(exchanges, run_time=run_time, symbol=symbol2))
+    data2 = [item for sublist in data2 for item in sublist]
+    data2 = pd.DataFrame(data2)
+    data2.to_csv("orderbooks2.csv", index=False)
+
+    print(data2)
