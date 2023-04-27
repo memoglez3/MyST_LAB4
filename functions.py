@@ -34,3 +34,38 @@ def procesar_orden_book(ob):
         microestructura_datos[exchange_id] = data_frame
     
     return microestructura_datos
+
+def OB_ts(data: pd.DataFrame)->pd.DataFrame:
+    """
+    Esta función toma un objeto DataFrame de Pandas que contiene
+      información de libros de órdenes y devuelve un nuevo objeto 
+      DataFrame que contiene información resumida de los libros de órdenes.
+    """
+    # código de la función
+    def ob_consume(ob: dict) -> list:
+        levels = len(np.unique(np.concatenate((np.array(ob["ask"]), np.array(ob["bid"])))))
+        ask_volume = np.sum(ob["ask_size"])
+        bid_volume = np.sum(ob["bid_size"])
+        total_volume = ask_volume + bid_volume
+        mid_price = np.sum(np.mean(ob["ask"])+np.mean(ob["bid"]))/2
+        mid_price_serie = np.array(ob["ask"]) + np.array(ob["bid"])/2
+        volume_serie = np.array(np.array(ob["ask_size"])+np.array(ob["bid_size"]))
+        vwap = np.sum(mid_price_serie*volume_serie)/total_volume
+        spread = np.array(ob["spread"]).mean()
+        return [levels,bid_volume,ask_volume,total_volume,mid_price,vwap,spread]
+    
+    ts_df = pd.DataFrame(columns=["exchange","timeStamp","level","Ask_Volume",
+                                  "Bid_Volume","Total_Volume","Mid_Price","VWAP","Spread"])
+    ts_df["exchange"] = data["exchange"]
+    ts_df["timeStamp"] = data["datetime"]
+    for i in range(len(ts_df)):
+        ob = ast.literal_eval(data["orderbook"][i])
+        ob_list = ob_consume(ob)
+        ts_df["level"][i] = ob_list[0]
+        ts_df["Ask_Volume"][i] = ob_list[1]
+        ts_df["Bid_Volume"][i] = ob_list[2]
+        ts_df["Total_Volume"][i] = ob_list[3]
+        ts_df["Mid_Price"][i] = ob_list[4]
+        ts_df["VWAP"][i] = ob_list[5]
+        ts_df["Spread"][i] = ob_list[6]
+    return ts_df
