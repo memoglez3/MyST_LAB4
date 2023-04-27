@@ -69,3 +69,36 @@ def OB_ts(data: pd.DataFrame)->pd.DataFrame:
         ts_df["VWAP"][i] = ob_list[5]
         ts_df["Spread"][i] = ob_list[6]
     return ts_df
+
+def micro_modelling(data: pd.DataFrame) -> pd.DataFrame:
+    """
+    Esta función toma un DataFrame de microestructura de un libro de órdenes
+    (order book) y calcula el spread efectivo en función del precio medio y la
+    ventana de tiempo especificada.
+    
+    Args:
+        data (pd.DataFrame): DataFrame de microestructura del libro de órdenes.
+    
+    Returns:
+        pd.DataFrame: DataFrame con la columna "Effective Spread" añadida.
+    """
+    order_book = data.reset_index()
+    last_timestamp = order_book.loc[:, "timeStamp"].values[-1]
+    lagged_timestamp = pd.to_datetime(last_timestamp) - datetime.timedelta(seconds=60)
+    lagged_index = sum(pd.to_datetime(order_book["timeStamp"]) <= lagged_timestamp)
+    window = len(order_book) - lagged_index
+    
+    mid_prices = order_book.loc[:, "Mid_Price"].astype(float)
+    effective_spreads = []
+    
+    for i in range(len(mid_prices) - (window * 2)):
+        covariance = np.cov(mid_prices[i:window + i], mid_prices[window + i:window * 2 + i])[0][1]
+        effective_spreads.append(np.abs(covariance) ** 0.5)
+    
+    order_book = order_book.iloc[len(order_book) - len(effective_spreads):, :]
+    order_book["Effective Spread"] = effective_spreads
+    order_book = order_book[["timeStamp", "Mid_Price", "Spread", "Effective Spread"]]
+    order_book.rename(columns={"Mid_Price": "Close"}, inplace=True)
+    order_book.set_index("timeStamp", inplace=True)
+    
+    return order_book
