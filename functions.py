@@ -75,12 +75,6 @@ def micro_modelling(data: pd.DataFrame) -> pd.DataFrame:
     Esta función toma un DataFrame de microestructura de un libro de órdenes
     (order book) y calcula el spread efectivo en función del precio medio y la
     ventana de tiempo especificada.
-    
-    Args:
-        data (pd.DataFrame): DataFrame de microestructura del libro de órdenes.
-    
-    Returns:
-        pd.DataFrame: DataFrame con la columna "Effective Spread" añadida.
     """
     order_book = data.reset_index()
     last_timestamp = order_book.loc[:, "timeStamp"].values[-1]

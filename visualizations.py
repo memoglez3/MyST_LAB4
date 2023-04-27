@@ -1,37 +1,23 @@
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+import plotly.subplots as sp
+import pandas as pd
 
-def graficos_plotly(ob, symbol: str):
-    
-    figs = []
-    
-    for exchange_id in ob.keys():
-        fig = make_subplots(specs=[[{"secondary_y": False}]])
+def timeseries_facet_plot(df: pd.DataFrame):
+    # Agrupar por exchange
+    exchange_groups = df.groupby("exchange")
+
+    # Crear una subfigura para cada columna de interés
+    fig = sp.make_subplots(rows=2, cols=3, subplot_titles=("Ask_Volume", "Bid_Volume", "Total_Volume", "Mid_Price", "VWAP", "Spread"))
+
+    # Tracer las series de tiempo de cada columna de interés en una subfigura separada para cada exchange
+    for col_idx, col_name in enumerate(["Ask_Volume", "Bid_Volume", "Total_Volume", "Mid_Price", "VWAP", "Spread"]):
+        row_idx = col_idx // 3 + 1
+        col_idx = col_idx % 3 + 1
         
-        fig.add_trace(go.Scatter(x = ob[exchange_id].index, y = ob[exchange_id]["Level"], name = exchange_id), 
-                       secondary_y = False,)
-        fig.update_layout(title = "Level: " + symbol,  yaxis_title = "Niveles", xaxis_title = "Fecha")
-        
-        fig.add_trace(go.Scatter(x = ob[exchange_id].index, y = ob[exchange_id]["Ask Volume"], name = exchange_id), 
-                       secondary_y = False,)
-        fig.update_layout(title = "Ask Volume: " + symbol,  yaxis_title = "Volumen", xaxis_title = "Fecha")
-        
-        fig.add_trace(go.Scatter(x = ob[exchange_id].index, y = ob[exchange_id]["Bid Volume"], name = exchange_id), 
-                       secondary_y = False,)
-        fig.update_layout(title = "Bid Volume: " + symbol,  yaxis_title = "Volumen", xaxis_title = "Fecha")
-        
-        fig.add_trace(go.Scatter(x = ob[exchange_id].index, y = ob[exchange_id]["Total Volume"], name = exchange_id), 
-                       secondary_y = False,)
-        fig.update_layout(title = "Total Volume: " + symbol,  yaxis_title = "Volumen", xaxis_title = "Fecha")
-        
-        fig.add_trace(go.Scatter(x = ob[exchange_id].index, y = ob[exchange_id]["Mid Price"], name = exchange_id), 
-                       secondary_y = False,)
-        fig.update_layout(title = "Mid Price: " + symbol,  yaxis_title = "Precio Dólares", xaxis_title = "Fecha")
-        
-        fig.add_trace(go.Scatter(x = ob[exchange_id].index, y = ob[exchange_id]["VWAP"], name = exchange_id), 
-                       secondary_y = False,)
-        fig.update_layout(title = "VWAP: " + symbol,  yaxis_title = "Precio Dólares", xaxis_title = "Fecha")
-        
-        figs.append(fig)
-    
-    return figs
+        for exchange, group in exchange_groups:
+            fig.add_trace(go.Scatter(x=group["timeStamp"], y=group[col_name], name=exchange), row=row_idx, col=col_idx)
+
+    # Configurar el diseño de la figura y mostrarla
+    fig.update_layout(height=800, width=1000, title="Series de Tiempo por Exchange")
+    fig.show()
+    return fig
