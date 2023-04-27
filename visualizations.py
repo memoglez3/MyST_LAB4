@@ -19,5 +19,4 @@ def timeseries_facet_plot(df: pd.DataFrame):
 
     # Configurar el diseño de la figura y mostrarla
     fig.update_layout(height=800, width=1000, title="Series de Tiempo por Exchange")
-    fig.show()
     return fig

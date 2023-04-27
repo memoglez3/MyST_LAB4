@@ -1,4 +1,5 @@
 import ccxt, datetime, numpy as np, pandas as pd, time 
+import ast
 
 def procesar_orden_book(ob):
     

@@ -20,8 +20,8 @@ def microestructura_v(ob, symbol: int):
     return microestructura_datos, figs
 
 # Creación de Dataframes de análisis
-series_de_tiempo_1 = functions.OB_ts(pd.read_csv("files/orderbooks1.csv"))
-series_de_tiempo_2 = functions.OB_ts(pd.read_csv("files/orderbooks2.csv"))
+series_de_tiempo_1 = functions.OB_ts(pd.read_csv('files/orderbooks1.csv'))
+series_de_tiempo_2 = functions.OB_ts(pd.read_csv('files/orderbooks2.csv'))
 microestructura_1 = functions.micro_modelling(series_de_tiempo_1)
 microestructura_2 = functions.micro_modelling(series_de_tiempo_2)
 
